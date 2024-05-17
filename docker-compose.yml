@@ -1,0 +1,6 @@
+version: '3.0'
+services:
+  web:
+    image: docker-lineage-builder:0.2_base
+    container_name: docker-lineage-builder
+    build: .

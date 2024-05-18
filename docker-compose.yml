@@ -1,6 +1,6 @@
 version: '3.0'
 services:
   builder:
-    image: docker-lineage-builder:0.3_added_platform-tools
+    image: docker-lineage-builder:0.4_installed_build_packages
     container_name: docker-lineage-builder
     build: .

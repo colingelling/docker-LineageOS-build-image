@@ -89,7 +89,13 @@ RUN set -x; \
     mkdir -p /root/bin; \
     mkdir -p /root/android/lineage
 
+ENV PATH="/root/bin:$PATH"
+
 VOLUME /root/android/lineage
+
+RUN set -x; \
+    curl https://storage.googleapis.com/git-repo-downloads/repo > /root/bin/repo; \
+    chmod a+x /root/bin/repo
 
 # Install Supervisor in order to let the image be able to run as a container when requested to do so
 RUN apt-get install supervisor -y

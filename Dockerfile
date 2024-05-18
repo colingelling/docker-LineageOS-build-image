@@ -85,14 +85,18 @@ RUN set -x; \
     add-apt-repository ppa:deadsnakes/ppa; \
     apt-get update && apt-get install python3.13 -y
 
+# Prepare both the 'repo' directory and the other one for builds
 RUN set -x; \
     mkdir -p /root/bin; \
     mkdir -p /root/android/lineage
 
+# Add bin folder to PATH for being able to use the 'repo' command later on
 ENV PATH="/root/bin:$PATH"
 
+# Share the path where builds will be stored
 VOLUME /root/android/lineage
 
+# Download repo
 RUN set -x; \
     curl https://storage.googleapis.com/git-repo-downloads/repo > /root/bin/repo; \
     chmod a+x /root/bin/repo

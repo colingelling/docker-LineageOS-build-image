@@ -4,3 +4,5 @@ services:
     image: docker-lineage-builder:0.4_installed_build_packages
     container_name: docker-lineage-builder
     build: .
+    volumes:
+      - ADD/YOUR/VOLUME:/root/android/lineage

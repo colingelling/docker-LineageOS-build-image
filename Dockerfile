@@ -16,11 +16,11 @@ RUN set -x; \
 # Download and prepare platform-tools
 RUN set -x; \
     wget https://dl.google.com/android/repository/platform-tools-latest-linux.zip -P /tmp; \
-    unzip /tmp/platform-tools-latest-linux.zip -d ${HOME}; \
+    unzip /tmp/platform-tools-latest-linux.zip -d /root; \
     rm -f /tmp/platform-tools-latest-linux.zip
 
 # Set the PATH environment variable
-ENV PATH="${HOME}/platform-tools:$PATH"
+ENV PATH="/root/platform-tools:$PATH"
 
 # Install build packages
 RUN set -x; \
@@ -84,6 +84,12 @@ RUN apt-get install software-properties-common -y
 RUN set -x; \
     add-apt-repository ppa:deadsnakes/ppa; \
     apt-get update && apt-get install python3.13 -y
+
+RUN set -x; \
+    mkdir -p /root/bin; \
+    mkdir -p /root/android/lineage
+
+VOLUME /root/android/lineage
 
 # Install Supervisor in order to let the image be able to run as a container when requested to do so
 RUN apt-get install supervisor -y

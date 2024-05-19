@@ -75,7 +75,8 @@ ENV PATH="$JAVA_HOME/bin:$PATH"
 RUN set -x; \
     mkdir -p /usr/lib/jvm/jdk-11.0.2; \
     mv /tmp/jdk-11.0.2/* /usr/lib/jvm/jdk-11.0.2; \
-    sed -i 's/TLSv1,TLSv1.1,//g' /usr/lib/jvm/jdk-11.0.2/conf/security/java.security
+    sed -i 's/TLSv1,TLSv1.1,//g' /usr/lib/jvm/jdk-11.0.2/conf/security/java.security; \
+    rm -rf /tmp/jdk-11.0.2
 
 # Avoid error 'add-apt-repository: command not found'
 RUN apt-get install software-properties-common -y
@@ -101,11 +102,26 @@ RUN set -x; \
     curl https://storage.googleapis.com/git-repo-downloads/repo > /root/bin/repo; \
     chmod a+x /root/bin/repo
 
+RUN mkdir /docker-entrypoint.initdb.d && mkdir /root/scripts
+COPY /image-data/docker-entrypoint.initdb.d /docker-entrypoint.initdb.d
+VOLUME /root/scripts
+
+RUN mkdir /root/environment
+COPY /image-data/environment/.env /root
+VOLUME /root/environment
+
+# Some repos are configured for lfs or Large File Storage, prepare the distribution for this
+RUN git lfs install
+
 # Install Supervisor in order to let the image be able to run as a container when requested to do so
 RUN apt-get install supervisor -y
 
 # Copy a custom Supervisor configuration from host into the image
-COPY image-data/etc/supervisor/conf.d/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
+COPY /image-data/etc/supervisor/conf.d/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
+
+COPY docker-entrypoint.sh /usr/local/bin/
+RUN chmod +x /usr/local/bin/docker-entrypoint.sh \
+    && ln -s /usr/local/bin/docker-entrypoint.sh /docker-entrypoint.sh
 
 # Call and execute the supervisor after build is complete
 CMD ["/usr/bin/supervisord", "-c", "/etc/supervisor/conf.d/supervisord.conf"]

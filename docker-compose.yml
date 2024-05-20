@@ -2,7 +2,7 @@ version: '3.0'
 services:
   builder:
     image: docker-lineage-builder:0.7_added_automation
-    container_name: docker-lineage-builder
+    container_name: docker-LineageOS-build-image
     build: .
     volumes:
       - /YOUR/PATH:/root/environment

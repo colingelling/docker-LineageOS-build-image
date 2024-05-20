@@ -8,7 +8,7 @@ load_script() {
   FILE="${SHARED_SCRIPTS_DIRECTORY}/$script"
 
   if [ -f "${FILE}" ] && [[ "${FILE,,}" =~ "main" ]]; then
-    source "${SHARED_SCRIPTS_DIRECTORY}/$script" && chmod +x "${SHARED_SCRIPTS_DIRECTORY}/$script"
+    source "${SHARED_SCRIPTS_DIRECTORY}/$script"
     echo "[ENTRYPOINT]: Loaded ${SHARED_SCRIPTS_DIRECTORY}/$script" >&2
   fi
 }

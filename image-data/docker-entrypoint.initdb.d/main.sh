@@ -1,6 +1,9 @@
 #!/bin/bash
 
+SHARED_SCRIPTS_DIRECTORY="/root/scripts"
+
 ENV_ARRAY=()
+STATE=()
 
 _readEnv() {
 
@@ -8,9 +11,7 @@ _readEnv() {
   
   if [ -n "${env_file[*]}" ]; then
 
-    echo "${env_file[0]}"
-
-    while IFS= read -r line; do
+    while IFS= read -r line || [[ -n $line ]]; do
 
       ENV_ARRAY+=("$line")
 
@@ -20,34 +21,61 @@ _readEnv() {
 
 }
 
-checkState() {
-    if [ "${STATE}" == 1 ]; then
-        echo "The variable has reached the desired state which is 1."
-        return 0
-    else
-        echo "The variable is not in the desired state. Current state: ${STATE}"
-        return 1
-    fi
-}
-
-main() {
-
-    _readEnv
+_isolateValue() {
 
     if [ -n "${ENV_ARRAY[*]}" ]; then
 
         for element in "${ENV_ARRAY[@]}"; do
 
-            if [[ "STATE" =~ $element ]]; then
+            if [[ $element =~ "STATE" ]]; then
 
-                STATE=$element
-                checkState
+                read -ra STATE <<< "$element"
 
             fi
 
         done
 
     fi
+
+}
+
+_executeScripts() {
+
+    mapfile -t DIRECTORY_CONTENT < <(ls ${SHARED_SCRIPTS_DIRECTORY})
+
+    if [ -n "${DIRECTORY_CONTENT[*]}" ]; then
+
+        for script in "${DIRECTORY_CONTENT[@]}"; do
+
+            if [[ ! "${script,,}" =~ "main" ]] && [[ ! "${script,,}" =~ "cleanup" ]]; then
+
+                source "${SHARED_SCRIPTS_DIRECTORY}/$script"
+
+            fi
+
+        done
+
+    fi
+}
+
+main() {
+
+    _readEnv
+    _isolateValue
+
+    for value in "${STATE[@]}"; do
+        if [[ $value == 1 ]]; then
+            echo && echo "[main.sh]: Your .env's STATE variable currently has reached the desired state which is $value. Building process starts now.."
+            # TODO: Start scripts in order
+
+            _executeScripts
+
+            return 0
+        elif [[ $value == 0 ]]; then
+            echo && echo "[main.sh]: Your .env's STATE variable currently hasn't been set to 'on', change it to '1' to start the process of building."
+            return 1
+        fi
+    done
 
 }
 

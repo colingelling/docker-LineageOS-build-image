@@ -1,10 +1,10 @@
 version: '3.0'
 services:
   builder:
-    image: docker-lineage-builder:0.7_configured_git
+    image: docker-lineage-builder:0.7_added_automation
     container_name: docker-lineage-builder
     build: .
     volumes:
-      - /home/colin/Documents/Dev/Docker/containers/data/lineage-build-environment:/root/environment
-      - /home/colin/Documents/Dev/Docker/containers/data/lineage-build-scripts:/root/scripts
-      - /home/colin/Downloads/LineageOS:/root/android/lineage
+      - /YOUR/PATH:/root/environment
+      - /YOUR/PATH:/root/scripts
+      - /YOUR/PATH:/root/android/lineage

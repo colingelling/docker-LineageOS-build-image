@@ -1,0 +1,10 @@
+version: '3.8'
+
+services:
+  build-image:
+    volumes:
+      # Edit these volumes if needed, use your own host path values
+      - ./container-data/LineageOS-build/environment:/root/environment
+      - ./container-data/LineageOS-build/scripts:/root/scripts
+      - ./container-data/LineageOS-build/download:/root/android/lineage
+      - ./container-data/LineageOS-build/download/.ccache:/root/.ccache

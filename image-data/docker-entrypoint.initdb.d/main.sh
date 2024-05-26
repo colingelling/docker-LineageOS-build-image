@@ -39,7 +39,7 @@ _isolateValue() {
 
 }
 
-_executeScripts() {
+execute() {
 
     mapfile -t DIRECTORY_CONTENT < <(ls ${SHARED_SCRIPTS_DIRECTORY})
 
@@ -58,28 +58,41 @@ _executeScripts() {
     fi
 }
 
+check_state() {
+    local state
+    for state in "${STATE[@]}"; do
+        if [[ $state == 1 ]]; then
+
+            echo && echo "[main.sh]: You started the build process in order to get LineageOS ready. This process is starting now.." && echo
+            execute
+
+            return 0
+
+        elif [[ $state == 0 ]]; then
+
+            if [[ $message_displayed == false ]]; then
+                echo && echo "[main.sh]: Your .env's STATE variable currently hasn't been set to 'on', change it to '1' to start the build process to get LineageOS ready." && echo
+                message_displayed=true
+            fi
+
+            return 1
+
+        fi
+    done
+}
+
 main() {
 
     _readEnv
     _isolateValue
 
-    for value in "${STATE[@]}"; do
-        if [[ $value == 1 ]]; then
-            echo && echo "[main.sh]: Your .env's STATE variable currently has reached the desired state which is $value. Building process starts now.."
-            # TODO: Start scripts in order
-
-            _executeScripts
-
-            return 0
-        elif [[ $value == 0 ]]; then
-            echo && echo "[main.sh]: Your .env's STATE variable currently hasn't been set to 'on', change it to '1' to start the process of building."
-            return 1
-        fi
-    done
+    check_state
 
 }
 
-# Loop to check whether the execution state has been changed or not
+message_displayed=false
+
+# Iterate to check whether the execution state has been changed or not
 while ! main; do
     sleep 10
 done

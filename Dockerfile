@@ -84,7 +84,7 @@ RUN apt-get install software-properties-common -y
 # Install Python
 RUN set -x; \
     add-apt-repository ppa:deadsnakes/ppa; \
-    apt-get update && apt-get install python3.13 -y
+    apt-get update && apt-get install python3.13 python-is-python3 -y
 
 # Prepare both the 'repo' directory and the other one for builds
 RUN set -x; \
@@ -110,8 +110,14 @@ RUN mkdir /root/environment
 COPY /image-data/environment/.env /root
 VOLUME /root/environment
 
-# Some repos are configured for lfs or Large File Storage, prepare the distribution for this
-RUN git lfs install
+ENV USE_CCACHE=1
+ENV CCACHE_DIR=/root/.ccache
+ENV CCACHE_EXEC=/usr/bin/ccache
+
+VOLUME /root/.ccache
+
+# Setup ccache
+RUN ccache -M 50G
 
 # Install Supervisor in order to let the image be able to run as a container when requested to do so
 RUN apt-get install supervisor -y

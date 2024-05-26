@@ -1,10 +1,5 @@
-version: '3.0'
 services:
-  builder:
-    image: docker-lineage-builder:0.7_added_automation
-    container_name: docker-LineageOS-build-image
+  build-image:
+    image: docker-lineageos-build-image:0.7_added_automation
+    container_name: docker-LineageOS-builder
     build: .
-    volumes:
-      - /YOUR/PATH:/root/environment
-      - /YOUR/PATH:/root/scripts
-      - /YOUR/PATH:/root/android/lineage
